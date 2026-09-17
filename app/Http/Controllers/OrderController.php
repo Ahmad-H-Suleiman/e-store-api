@@ -16,13 +16,18 @@ class OrderController extends Controller
         $validated_data=$request->validated();
         $validated_data['user_id']=$user_id;
         $total=0;
-
+        try{
         DB::transaction(function() use($validated_data, $total){
 
             $order=Order::create($validated_data);
 
             foreach($validated_data['products'] as $p){
                 $product=Product::findOrFail($p['product_id']);
+
+                if ($product->is_available == 0){
+                    throw new \Exception('product is not available');
+                }
+
                 $subtotal=$product->price * $p['quantity'];
 
                 $order->products()->create([
@@ -39,6 +44,11 @@ class OrderController extends Controller
         });
 
         return response()->json(['message'=>'created sucssessfully'],201);
+    
+    } catch(\Exception $e){
+        return response()->json(['message'=>$e->getMessage()], 409);
+    }
+    
     }
 
     public function update($order_id){

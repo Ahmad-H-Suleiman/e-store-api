@@ -13,6 +13,7 @@ class Product extends Model
         'bio',
         'image',
         'price',
+        'is_available',
     ];
 
 

@@ -21,7 +21,7 @@ Route::post('logout',[UserController::class,'logout'])->middleware('auth:sanctum
 
 Route::get('product', [ProductController::class, 'index']);
 Route::get('product/{droduct_id}', [ProductController::class, 'show']);
-Route::get('seller/{seller_id}', [SellerController::class, 'getSellerInfo']);
+Route::get('seller/{seller_id}', [SellerController::class, 'getSellerInfo'])->whereNumber('seller_id');
 
 Route::middleware('auth:sanctum')->group(function(){
 
@@ -67,12 +67,12 @@ Route::middleware(['auth:sanctum', 'admin'])->group(function(){
     Route::get('admin/sellers', [AdminController::class, 'getAllSellers']);
     Route::get('admin/orders', [AdminController::class, 'getAllOrders']);
     Route::get('admin/unavailableProduct', [AdminController::class, 'getUnavalableProducts']);
-    Route::get('admin/product', [AdminController::class, 'getProduct']);
+    Route::get('admin/product/{product_id}', [AdminController::class, 'getProduct']);
 
     Route::put('admin/{order_id}/order', [AdminController::class, 'updateOrderStatus']);
 
     // Route::delete('admin/{seller_id}/seller', [AdminController::class, 'deleteSeller']);
-    Route::delete('admin/{product_id}/product', [AdminController::class, 'deleteProduct']);
+    Route::delete('admin/product/{product_id}', [AdminController::class, 'deleteProduct']);
 
 
 });
