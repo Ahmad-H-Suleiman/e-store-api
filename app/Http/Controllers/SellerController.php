@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\UnauthorizedActionException;
 use App\Http\Requests\StoreSellerRequest;
 use App\Http\Requests\UpdateSellerRequest;
 use App\Models\Product;
@@ -94,7 +95,7 @@ class SellerController extends Controller
         $product=Product::findOrFail($product_id);
 
         if($product->seller->user_id != Auth::user()->id){
-            return response()->json(['message'=>'anuthriz'],403);
+            throw new UnauthorizedActionException('you are not authorized to modify this product');
         }
 
         if($product->is_available==1){

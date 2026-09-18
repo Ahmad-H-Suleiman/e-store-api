@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\ProductUnavailableException;
+use App\Exceptions\UnauthorizedActionException;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProducRequest;
 use App\Models\Product;
@@ -23,7 +25,7 @@ class ProductController extends Controller
         $product=Product::findOrFail($product_id);
 
         if($product->is_available==0){
-            return response()->json(['message'=>'this product not available now'],200);
+            throw new ProductUnavailableException('product is not available');
         }
 
         return response()->json($product, 200);
@@ -52,11 +54,11 @@ class ProductController extends Controller
         $validated_data=$request->validated();
 
         if($product->seller->user_id != Auth::user()->id){
-            return response()->json(['message'=>'anuthriz'],403);
+            throw new UnauthorizedActionException('you are not authorized to modify this product');
         }
 
         if($product->is_available==0){
-            return response()->json(['message'=>'this product not available now'],200);
+            throw new ProductUnavailableException('product is not available');
         }
 
 
@@ -80,11 +82,11 @@ class ProductController extends Controller
         $product=Product::findOrFail($product_id);
 
         if($product->seller->user_id != Auth::user()->id){
-            return response()->json(['message'=>'anuthriz'],403);
+            throw new UnauthorizedActionException('you are not authorized to delete this product');
         }
 
         if($product->is_available==0){
-            return response()->json(['message'=>'this product not available now'],200);
+            throw new ProductUnavailableException('product is not available');
         }
         
         $product->update(['is_available'=>0]);
@@ -96,11 +98,11 @@ class ProductController extends Controller
         $product=Product::findOrFail($product_id);
 
         if(Auth::user()->seller->id != $product->seller_id){
-            return response()->json(['message'=>'anuth'], 403);
+            throw new UnauthorizedActionException('you are not authorized to modify this product');
         }
 
         if($product->is_available==0){
-            return response()->json(['message'=>'this product not available now'],200);
+            throw new ProductUnavailableException('product is not available');
         }
 
         $product->categories()->syncWithoutDetaching($request->category_id);
@@ -110,7 +112,7 @@ class ProductController extends Controller
         $product=Product::findOrFail($product_id);
 
         if($product->is_available==0){
-            return response()->json(['message'=>'this product not available now'],200);
+            throw new ProductUnavailableException('product is not available');
         }
 
         $categories=$product->categories;

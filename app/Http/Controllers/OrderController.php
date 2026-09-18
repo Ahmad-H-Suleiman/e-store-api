@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\ProductUnavailableException;
+use App\Exceptions\UnauthorizedActionException;
 use App\Http\Requests\StoreOrderRequest;
 use App\Models\Order;
 use App\Models\Product;
@@ -16,7 +18,7 @@ class OrderController extends Controller
         $validated_data=$request->validated();
         $validated_data['user_id']=$user_id;
         $total=0;
-        try{
+
         DB::transaction(function() use($validated_data, $total){
 
             $order=Order::create($validated_data);
@@ -25,7 +27,7 @@ class OrderController extends Controller
                 $product=Product::findOrFail($p['product_id']);
 
                 if ($product->is_available == 0){
-                    throw new \Exception('product is not available');
+                    throw new ProductUnavailableException('product is not available');
                 }
 
                 $subtotal=$product->price * $p['quantity'];
@@ -44,18 +46,16 @@ class OrderController extends Controller
         });
 
         return response()->json(['message'=>'created sucssessfully'],201);
-    
-    } catch(\Exception $e){
-        return response()->json(['message'=>$e->getMessage()], 409);
+
     }
     
-    }
+    
 
     public function update($order_id){
         $order=Order::findOrFail($order_id);
         
         if($order->user_id != Auth::user()->id){
-            return response()->json(['message'=>'anuth', 403]);
+            throw new UnauthorizedActionException('you are not authorized to modify this order');
         }
 
         if($order->status != "processing"){
@@ -64,7 +64,7 @@ class OrderController extends Controller
 
         $order->update(['status'=>'cancelled']);
         
-        return response()->json(['message'=>'updated sucssessfully'], 201);
+        return response()->json(['message'=>'updated sucssessfully'], 200);
     }
 
     

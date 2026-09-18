@@ -14,7 +14,7 @@ class CategoryController extends Controller
     }
     
     public function getCategoryProducts($category_id){
-        $products=Category::findOrFail($category_id)->products;
+        $products=Category::findOrFail($category_id)->products()->where('is_available', 1)->get();
         return response()->json($products,200);
     }
 }

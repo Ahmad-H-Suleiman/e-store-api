@@ -25,7 +25,7 @@ class UpdateSellerRequest extends FormRequest
         return [
             'address'=>'sometimes|string|max:100',
             'phone'=>'sometimes|string|max:15',
-            'baio'=>'sometimes|nullable|string',
+            'bio'=>'sometimes|nullable|string',
             'image'=>'sometimes|image|mimes:png,jpg,jpeg,gif|max:2048'
         ];
     }

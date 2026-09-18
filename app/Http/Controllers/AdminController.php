@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\ProductUnavailableException;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Seller;
@@ -26,7 +27,7 @@ class AdminController extends Controller
         $product=Product::findOrFail($product_id);
 
         if($product->is_available==0){
-            return response()->json(['message'=>'this product not available now'],200);
+            throw new ProductUnavailableException('product is not available'); 
         }
         
         $product->update(['is_available'=>0]);
@@ -63,7 +64,7 @@ class AdminController extends Controller
         
         $order->update(['status'=>$request->status]);
         
-        return response()->json(['message'=>'updated sucssessfully'], 201);
+        return response()->json(['message'=>'updated sucssessfully'], 200);
     }
 
     public function getUnavalableProducts(){

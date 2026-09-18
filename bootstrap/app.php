@@ -1,5 +1,7 @@
 <?php
 
+use App\Exceptions\ProductUnavailableException;
+use App\Exceptions\UnauthorizedActionException;
 use App\Http\Middleware\IsAdmin;
 use App\Http\Middleware\IsSeller;
 use App\Http\Middleware\seller;
@@ -22,5 +24,12 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions): void {
-        //
+        $exceptions->render(function(ProductUnavailableException $e){
+            return response()->json(['message'=>$e->getMessage()], 409);
+        });
+
+        $exceptions->render(function(UnauthorizedActionException $e){
+            return response()->json(['message'=>$e->getMessage()], 403);
+        });
+
     })->create();
