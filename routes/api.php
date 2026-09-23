@@ -1,12 +1,14 @@
 <?php
 
 use App\Http\Controllers\AdminController;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\ProductController;
 use App\Http\Controllers\SellerController;
 use App\Http\Controllers\UserController;
 use App\Models\Product;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -15,15 +17,22 @@ use Illuminate\Support\Facades\Route;
 // })->middleware('auth:sanctum');
 
 
-Route::post('register',[UserController::class,'register']);
-Route::post('login',[UserController::class,'login']);
-Route::post('logout',[UserController::class,'logout'])->middleware('auth:sanctum');
+Route::post('register',[AuthController::class,'register']);
+Route::post('login',[AuthController::class,'login']);
+Route::post('logout',[AuthController::class,'logout'])->middleware('auth:sanctum');
+
+Route::get('/email/verify/{id}/{hash}', function(EmailVerificationRequest $request){
+    $request->fulfill();
+    return response()->json(['message'=>'verifaied successfully']);
+})->middleware(['auth:sanctum', 'signed'])->name('verification.verify');
+
+Route::post('/email/resend', [AuthController::class, 'resrndVerification'])->middleware(['throttle:verification']);
 
 Route::get('product', [ProductController::class, 'index']);
 Route::get('product/{droduct_id}', [ProductController::class, 'show']);
 Route::get('seller/{seller_id}', [SellerController::class, 'getSellerInfo'])->whereNumber('seller_id');
 
-Route::middleware('auth:sanctum')->group(function(){
+Route::middleware(['auth:sanctum', 'verified'])->group(function(){
 
     Route::get('user', [UserController::class, 'getUser']);
     Route::get('user/orders', [UserController::class, 'getUserOrders']);
@@ -45,7 +54,7 @@ Route::middleware('auth:sanctum')->group(function(){
 
 
 
-Route::middleware(['auth:sanctum', 'seller'])->group(function(){
+Route::middleware(['auth:sanctum', 'seller', 'verified'])->group(function(){
 
     Route::put('seller', [SellerController::class, 'update']);
     // Route::delete('seller', [SellerController::class, 'destroy']);
