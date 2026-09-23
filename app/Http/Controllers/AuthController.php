@@ -2,12 +2,17 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\ForgetPasswordRequest;
 use App\Http\Requests\LoginUserRequest;
 use App\Http\Requests\RegisterUserRequest;
+use App\Http\Requests\ResetPasswordRequest;
 use App\Models\User;
 use Auth;
 use Hash;
+use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Http\Request;
+use Str;
+use Illuminate\Support\Facades\Password;
 
 class AuthController extends Controller
 {
@@ -69,4 +74,35 @@ class AuthController extends Controller
         ],200);
 
     } 
+
+    public function forgotPassword(ForgetPasswordRequest $request){
+        $status=Password::sendResetLink($request->only('email'));
+        if ($status === Password::RESET_LINK_SENT){
+            return response()->json(['message'=>'Password reset link sent successfully'], 200);
+        }
+
+        if ($status === Password::RESET_THROTTLED){
+            return response()->json(['message'=>'password rest email has been sent blease wait if you need another one'], 429);
+        }
+
+        return response()->json(['message'=>'some thing went rong'], 400);
+    }
+
+    public function resetPassword(ResetPasswordRequest $request){
+        $status=Password::reset($request->only('email', 'password', 'password_confirmation', 'token'), function ($user, $password){
+            $user->forceFill(['password'=>Hash::make($password),])->setRememberToken(Str::random(60));
+            $user->save();
+            $user->tokens()->delete();
+            event(new PasswordReset($user));
+        });
+
+        if($status === Password::PASSWORD_RESET){
+            return response()->json(['message'=>'Password reset successfully'], 200);
+        }
+
+        return response()->json(['message'=>'Invalid or expired password token'], 400);
+
+    }
+
+
 }

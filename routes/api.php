@@ -26,7 +26,19 @@ Route::get('/email/verify/{id}/{hash}', function(EmailVerificationRequest $reque
     return response()->json(['message'=>'verifaied successfully']);
 })->middleware(['auth:sanctum', 'signed'])->name('verification.verify');
 
-Route::post('/email/resend', [AuthController::class, 'resrndVerification'])->middleware(['throttle:verification']);
+Route::post('email/resend', [AuthController::class, 'resrndVerification'])->middleware(['throttle:verification']);
+Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
+Route::post('reset-password', [AuthController::class, 'resetPassword']);
+
+Route::get('reset-password/{token}', function (Request $request ,string $token){
+    return response()->json([
+        'message'=>'Password reset page',
+        'token'=>$token,
+        'email'=>$request->query('email'),
+    ]);
+    
+})->name('password.reset');
+
 
 Route::get('product', [ProductController::class, 'index']);
 Route::get('product/{droduct_id}', [ProductController::class, 'show']);
