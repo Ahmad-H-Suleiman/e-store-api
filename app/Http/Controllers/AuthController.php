@@ -23,7 +23,7 @@ class AuthController extends Controller
             'password'=>Hash::make($request->password)
             ]);
 
-            $token=$user->createToken('auth_token')->plainTextToken;
+            $token=$user->createToken('registeration_token')->plainTextToken;
 
             $user->sendEmailVerificationNotification();
 
@@ -66,7 +66,7 @@ class AuthController extends Controller
         }
 
         $user->sendEmailVerificationNotification();
-        $token=$user->createToken('auth_token')->plainTextToken;
+        $token=$user->createToken('registeration_token')->plainTextToken;
 
         return response()->json([
             'message'=>'the verify email has been sent',

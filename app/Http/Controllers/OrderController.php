@@ -59,7 +59,7 @@ class OrderController extends Controller
         }
 
         if($order->status != "processing"){
-            return response()->json(['message'=>'you cant canceled order after confirmed', 403]);
+            return response()->json(['message'=>'you cant canceled order after confirmed'], 403);
         }
 
         $order->update(['status'=>'cancelled']);
