@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Exceptions\ProductUnavailableException;
 use App\Exceptions\UnauthorizedActionException;
 use App\Http\Requests\StoreOrderRequest;
+use App\Http\Resources\OrderResource;
 use App\Models\Order;
 use App\Models\Product;
 use DB;
@@ -52,7 +53,7 @@ class OrderController extends Controller
     
 
     public function update($order_id){
-        $order=Order::findOrFail($order_id);
+        $order=Order::with('products.product')->findOrFail($order_id);
         
         if($order->user_id != Auth::user()->id){
             throw new UnauthorizedActionException('you are not authorized to modify this order');
@@ -64,7 +65,7 @@ class OrderController extends Controller
 
         $order->update(['status'=>'cancelled']);
         
-        return response()->json(['message'=>'updated sucssessfully'], 200);
+        return new OrderResource($order);
     }
 
     

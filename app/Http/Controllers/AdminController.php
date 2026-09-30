@@ -3,6 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Exceptions\ProductUnavailableException;
+use App\Http\Resources\OrderResource;
+use App\Http\Resources\ProductResource;
+use App\Http\Resources\SellerResource;
+use App\Http\Resources\UserResource;
 use App\Models\Order;
 use App\Models\Product;
 use App\Models\Seller;
@@ -14,13 +18,13 @@ use Storage;
 class AdminController extends Controller
 {
     public function getAllSellers(){
-        $sellers=Seller::all();
-        return response()->json($sellers, 200);
+        $sellers=User::with('seller')->where('role','seller')->paginate(50);
+        return UserResource::collection($sellers);
     }
 
     public function getAllUsers(){
-        $users=User::all();
-        return response()->json($users, 200);
+        $users=User::paginate(50);
+        return UserResource::collection($users);        
     }
 
     public function deleteProduct($product_id){
@@ -54,30 +58,30 @@ class AdminController extends Controller
     // }
 
     public function getAllOrders(){
-        $orders=Order::all();
-        return response()->json($orders, 200);
+        $orders=Order::with('products.product')->paginate(50);
+        return OrderResource::collection($orders);
     }
 
     public function updateOrderStatus(Request $request, $order_id){
         $request->validate(['status'=>'required|string|in:processing,confirmed,completed,cancelled']);
-        $order=Order::findOrFail($order_id);
+        $order=Order::with('products.product')->findOrFail($order_id);
         
         $order->update(['status'=>$request->status]);
         
-        return response()->json(['message'=>'updated sucssessfully'], 200);
+        return new OrderResource($order);
     }
 
     public function getUnavalableProducts(){
-        $products=Product::where('is_available',0)->get();
+        $products=Product::where('is_available',0)->paginate(50);
 
-        return response()->json($products,200);
+        return ProductResource::collection($products);
     }
 
     public function getProduct($product_id){
 
-        $product=Product::findOrFail($product_id);
+        $product=Product::with('seller.user')->findOrFail($product_id);
 
-        return response()->json($product,200);
+        return new ProductResource($product);
     }
 
 }

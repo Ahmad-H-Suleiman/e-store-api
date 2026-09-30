@@ -6,6 +6,8 @@ use App\Exceptions\ProductUnavailableException;
 use App\Exceptions\UnauthorizedActionException;
 use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProducRequest;
+use App\Http\Resources\CategoryResource;
+use App\Http\Resources\ProductResource;
 use App\Models\Product;
 use DB;
 use Illuminate\Http\Request;
@@ -16,19 +18,19 @@ class ProductController extends Controller
 {
 
     public function index(){
-        $products=Product::where('is_available',1)->get();
+        $products=Product::where('is_available',1)->paginate(50);
 
-        return response()->json($products,200);
+        return ProductResource::collection($products);
     }
 
     public function show($product_id){
-        $product=Product::findOrFail($product_id);
+        $product=Product::with('seller.user')->findOrFail($product_id);
 
         if($product->is_available==0){
             throw new ProductUnavailableException('product is not available');
         }
 
-        return response()->json($product, 200);
+        return new ProductResource($product);
     }
 
     public function store(StoreProductRequest $request){
@@ -50,7 +52,7 @@ class ProductController extends Controller
 
     public function update(UpdateProducRequest $request, $product_id){
 
-        $product=Product::findOrFail($product_id);
+        $product=Product::with('seller.user')->findOrFail($product_id);
         $validated_data=$request->validated();
 
         if($product->seller->user_id != Auth::user()->id){
@@ -74,7 +76,7 @@ class ProductController extends Controller
             Storage::disk('public')->delete($oldImage);
         }
 
-        return response()->json(['message'=>'updated sucssesfully'], 200);
+        return new ProductResource($product);
 
     }
 
@@ -106,7 +108,7 @@ class ProductController extends Controller
         }
 
         $product->categories()->syncWithoutDetaching($request->category_id);
-        return response()->json('category attached',201);
+        return response()->json(['message'=>'category attached'], 200);
     }
     public function getProductCategories($product_id){
         $product=Product::findOrFail($product_id);
@@ -116,7 +118,7 @@ class ProductController extends Controller
         }
 
         $categories=$product->categories;
-        return response()->json($categories,200);
+        return CategoryResource::collection($categories);
     }
 
 }

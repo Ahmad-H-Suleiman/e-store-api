@@ -18,7 +18,7 @@ class IsAdmin
     {
         if (Auth::user()->role==='admin')
         return $next($request);
-            return response()->json(['message'=>'you are not admin'], 403);
+            return response()->json(['message'=>'you are not an admin'], 403);
         
     }
 }

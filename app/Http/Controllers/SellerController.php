@@ -5,6 +5,8 @@ namespace App\Http\Controllers;
 use App\Exceptions\UnauthorizedActionException;
 use App\Http\Requests\StoreSellerRequest;
 use App\Http\Requests\UpdateSellerRequest;
+use App\Http\Resources\ProductResource;
+use App\Http\Resources\SellerResource;
 use App\Models\Product;
 use App\Models\Seller;
 use App\Models\User;
@@ -16,13 +18,13 @@ use Illuminate\Support\Facades\Storage;
 class SellerController extends Controller
 {
     public function index(){
-        $seller=Auth::user()->seller;
-        return response()->json($seller,200);
+        $seller=Auth::user()->seller()->with('user')->first();
+        return new SellerResource($seller);
     }
 
     public function getSellerInfo($seller_id){
-        $seller=Seller::findOrFail($seller_id);
-        return response()->json($seller,200);
+        $seller=Seller::with('user')->findOrFail($seller_id);
+        return new SellerResource($seller);
     }
 
 
@@ -53,7 +55,7 @@ class SellerController extends Controller
 
         $user_id=Auth::user()->id;
         $validated_data=$request->validated();
-        $seller=Seller::where('user_id', $user_id)->firstOrFail();
+        $seller=Seller::with('user')->where('user_id', $user_id)->firstOrFail();
         $oldImage=null;
         if($request->hasFile('image')){
             $oldImage=$seller->image;
@@ -66,7 +68,7 @@ class SellerController extends Controller
             Storage::disk('public')->delete($oldImage);
         }
 
-        return response()->json(['message'=>'updated sucssesfully'], 200);
+        return new SellerResource($seller);
     }
 
     // public function destroy(){
@@ -88,7 +90,7 @@ class SellerController extends Controller
 
     public function getSellerProducts(){
         $products=Auth::user()->seller->products;
-        return response()->json($products, 200);
+        return ProductResource::collection($products);
     }
 
     public function updateProductStatus($product_id){
@@ -104,7 +106,7 @@ class SellerController extends Controller
         
         $product->update(['is_available'=>1]);
         
-        return response()->json(['message'=>'updated sucssesfully'],200);
+        return new ProductResource($product);
     }
 
 }
