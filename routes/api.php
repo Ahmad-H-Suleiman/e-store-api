@@ -26,7 +26,7 @@ Route::get('/email/verify/{id}/{hash}', function(EmailVerificationRequest $reque
     return response()->json(['message'=>'verifaied successfully']);
 })->middleware(['auth:sanctum', 'signed'])->name('verification.verify');
 
-Route::post('email/resend', [AuthController::class, 'resrndVerification'])->middleware(['throttle:verification']);
+Route::post('email/resend', [AuthController::class, 'resendVerification'])->middleware(['throttle:verification']);
 Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
 Route::post('reset-password', [AuthController::class, 'resetPassword']);
 
@@ -41,8 +41,13 @@ Route::get('reset-password/{token}', function (Request $request ,string $token){
 
 
 Route::get('product', [ProductController::class, 'index']);
-Route::get('product/{droduct_id}', [ProductController::class, 'show']);
+Route::get('product/{product_id}', [ProductController::class, 'show']);
 Route::get('seller/{seller_id}', [SellerController::class, 'getSellerInfo'])->whereNumber('seller_id');
+
+Route::get('product/{product_id}/categories',[ProductController::class, 'getProductCategories']);
+Route::get('category/{category_id}/products',[CategoryController::class, 'getCategoryProducts']);
+Route::get('category',[CategoryController::class, 'index']);
+
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function(){
 
@@ -54,9 +59,6 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function(){
     Route::post('seller', [SellerController::class, 'store']);
 
 
-
-    Route::get('product/{product_id}/categories',[ProductController::class, 'getProductCategories']);
-    Route::get('category/{category_id}/products',[CategoryController::class, 'getCategoryProducts']);
 
 
     Route::post('order', [OrderController::class, 'store']);
@@ -78,7 +80,7 @@ Route::middleware(['auth:sanctum', 'seller', 'verified'])->group(function(){
     Route::delete('product/{product_id}', [ProductController::class, 'destroy']);
     Route::put('product/return/{product_id}', [SellerController::class, 'updateProductStatus']);
 
-    Route::post('product/{product_id}/categories',[ProductController::class, 'addCtegoriesToProduct']);
+    Route::post('product/{product_id}/categories',[ProductController::class, 'addCategoriesToProduct']);
 
 
 });

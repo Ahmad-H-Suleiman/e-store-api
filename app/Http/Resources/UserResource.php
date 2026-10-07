@@ -21,7 +21,6 @@ class UserResource extends JsonResource
             'role'=>$this->role,
             'created_at'=>$this->created_at->format('Y-m-d'),
             'seller'=>new SellerResource($this->whenLoaded('seller')),
-            'user'=>new SellerResource($this->whenLoaded('user')),
         ];
     }
 }

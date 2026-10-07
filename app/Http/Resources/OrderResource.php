@@ -21,7 +21,7 @@ class OrderResource extends JsonResource
             'status'=>$this->status,
             'total'=>$this->total,
             'created_at'=>$this->created_at->format('Y-m-d'),
-            'updated_at'=>$this->created_at->format('Y-m-d'),
+            'updated_at'=>$this->updated_at->format('Y-m-d'),
             'order_product'=>OrderProductResource::collection($this->whenLoaded('products'))
         ];
     }

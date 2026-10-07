@@ -96,7 +96,7 @@ class ProductController extends Controller
         return response()->json(null,204);
     }
 
-    public function addCtegoriesToProduct(Request $request,$product_id){
+    public function addCategoriesToProduct(Request $request,$product_id){
         $product=Product::findOrFail($product_id);
 
         if(Auth::user()->seller->id != $product->seller_id){

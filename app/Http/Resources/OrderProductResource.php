@@ -20,7 +20,7 @@ class OrderProductResource extends JsonResource
             'price'=>$this->price,
             'quantity'=>$this->quantity,
             'subtotal'=>$this->subtotal,
-            'product'=>new SellerResource($this->whenLoaded('product'))
+            'product'=>new ProductResource($this->whenLoaded('product'))
         ];
     }
 }

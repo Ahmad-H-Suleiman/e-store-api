@@ -57,7 +57,7 @@ class AuthController extends Controller
         
     }
 
-    public function resrndVerification(Request $request){
+    public function resendVerification(Request $request){
         $request->validate(['email'=>'required|email|exists:users,email']);
         $user=User::where('email', $request->email)->firstOrFail();
 
