@@ -53,8 +53,7 @@ Users must verify their email addresses before accessing routes protected by the
 ## API Documentation
 
 The API documentation was generated using Bruno and includes API requests and saved response examples.
-
-**[View API Documentation](./store%20collection-documentation.html)**
+its in the project file.
 
 ## Installation
 
