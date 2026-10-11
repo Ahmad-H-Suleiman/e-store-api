@@ -17,52 +17,49 @@ use Illuminate\Support\Facades\Route;
 // })->middleware('auth:sanctum');
 
 
-Route::post('register',[AuthController::class,'register']);
+Route::post('register',[AuthController::class,'register']); //
 Route::post('login',[AuthController::class,'login']);
-Route::post('logout',[AuthController::class,'logout'])->middleware('auth:sanctum');
+Route::post('logout',[AuthController::class,'logout'])->middleware('auth:sanctum'); //
 
-Route::get('/email/verify/{id}/{hash}', function(EmailVerificationRequest $request){
+Route::get('/email/verify/{id}/{hash}', function(EmailVerificationRequest $request){ 
     $request->fulfill();
     return response()->json(['message'=>'verifaied successfully']);
-})->middleware(['auth:sanctum', 'signed'])->name('verification.verify');
+})->middleware(['auth:sanctum', 'signed'])->name('verification.verify'); //
 
-Route::post('email/resend', [AuthController::class, 'resendVerification'])->middleware(['throttle:verification']);
-Route::post('forgot-password', [AuthController::class, 'forgotPassword']);
-Route::post('reset-password', [AuthController::class, 'resetPassword']);
+Route::post('email/resend', [AuthController::class, 'resendVerification'])->middleware(['throttle:verification']); //
+Route::post('forgot-password', [AuthController::class, 'forgotPassword']); //
+Route::post('reset-password', [AuthController::class, 'resetPassword']); //
 
 Route::get('reset-password/{token}', function (Request $request ,string $token){
     return response()->json([
         'message'=>'Password reset page',
         'token'=>$token,
         'email'=>$request->query('email'),
-    ]);
+    ]); 
     
-})->name('password.reset');
+})->name('password.reset');  //
 
 
-Route::get('product', [ProductController::class, 'index']);
-Route::get('product/{product_id}', [ProductController::class, 'show']);
-Route::get('seller/{seller_id}', [SellerController::class, 'getSellerInfo'])->whereNumber('seller_id');
+Route::get('product', [ProductController::class, 'index']);  //
+Route::get('product/{product_id}', [ProductController::class, 'show']);  //
+Route::get('seller/{seller_id}', [SellerController::class, 'getSellerInfo'])->whereNumber('seller_id');  //
 
-Route::get('product/{product_id}/categories',[ProductController::class, 'getProductCategories']);
-Route::get('category/{category_id}/products',[CategoryController::class, 'getCategoryProducts']);
-Route::get('category',[CategoryController::class, 'index']);
+Route::get('product/{product_id}/categories',[ProductController::class, 'getProductCategories']);  //
+Route::get('category/{category_id}/products',[CategoryController::class, 'getCategoryProducts']);  //
+Route::get('categories',[CategoryController::class, 'index']);  //
 
 
 Route::middleware(['auth:sanctum', 'verified'])->group(function(){
 
-    Route::get('user', [UserController::class, 'getUser']);
-    Route::get('user/orders', [UserController::class, 'getUserOrders']);
+    Route::get('user', [UserController::class, 'getUser']);  //
+    Route::get('user/orders', [UserController::class, 'getUserOrders']);  //
 
 
-    Route::get('seller', [SellerController::class, 'index']);
-    Route::post('seller', [SellerController::class, 'store']);
+    Route::post('seller', [SellerController::class, 'store']); //
 
 
-
-
-    Route::post('order', [OrderController::class, 'store']);
-    Route::put('order/{order_id}', [OrderController::class, 'update']);
+    Route::post('order', [OrderController::class, 'store']);  //
+    Route::put('order/{order_id}', [OrderController::class, 'update']);  //
 
 });
 
@@ -70,17 +67,19 @@ Route::middleware(['auth:sanctum', 'verified'])->group(function(){
 
 Route::middleware(['auth:sanctum', 'seller', 'verified'])->group(function(){
 
-    Route::put('seller', [SellerController::class, 'update']);
+
+    Route::get('seller', [SellerController::class, 'index']);  //
+    Route::put('seller', [SellerController::class, 'update']);  //
     // Route::delete('seller', [SellerController::class, 'destroy']);
 
-    Route::get('seller/products', [SellerController::class, 'getSellerProducts']);
+    Route::get('seller/products', [SellerController::class, 'getSellerProducts']);  //
 
-    Route::post('product', [ProductController::class, 'store']);
-    Route::put('product/{product_id}', [ProductController::class, 'update']);
-    Route::delete('product/{product_id}', [ProductController::class, 'destroy']);
-    Route::put('product/return/{product_id}', [SellerController::class, 'updateProductStatus']);
+    Route::post('product', [ProductController::class, 'store']);  //
+    Route::put('product/{product_id}', [ProductController::class, 'update']);  // 
+    Route::delete('product/{product_id}', [ProductController::class, 'destroy']);  //
+    Route::put('product/return/{product_id}', [SellerController::class, 'updateProductStatus']);  //
 
-    Route::post('product/{product_id}/categories',[ProductController::class, 'addCategoriesToProduct']);
+    Route::post('product/{product_id}/categories',[ProductController::class, 'addCategoriesToProduct']);  //
 
 
 });

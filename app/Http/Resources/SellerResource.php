@@ -20,7 +20,7 @@ class SellerResource extends JsonResource
             'address'=>$this->address,
             'bio'=>$this->bio,
             'image'=>$this->image,
-            'user'=>new SellerResource($this->whenLoaded('user')),
+            'user'=>new UserResource($this->whenLoaded('user')),
         ];
     }
 }
